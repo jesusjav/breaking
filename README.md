@@ -1,4 +1,3 @@
 # Breaking Bad test using compose and flows
 
-![](https://firebasestorage.googleapis.com/v0/b/chuecamobile4.appspot.com/o/previewcompressed.gif?alt=media&token=efd95ba6-2a17-43f0-bab9-384819bbc5be)
-
+![previewcompressed](https://user-images.githubusercontent.com/5457468/152528220-3dddfc47-d1dd-44e4-a555-76537433b794.gif)
