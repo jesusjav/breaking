@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BreakingBadTest</string>
+    <string name="breaking">Breaking Test</string>
+    <string name="empty">Empty</string>
+</resources>
