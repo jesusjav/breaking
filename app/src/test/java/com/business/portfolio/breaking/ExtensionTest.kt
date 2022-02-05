@@ -16,19 +16,21 @@
 package com.business.portfolio.breaking
 
 import com.business.portfolio.breaking.presentation.utils.areAllUnchecked
-import org.junit.Assert.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
+import org.junit.Assert
 import org.junit.Test
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
+class ExtensionTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun check_all_distinct() {
+        val list = listOf(true, false, true, false, true)
+        assertFalse(list.areAllUnchecked())
     }
 
-
+    @Test
+    fun check_all_unMarked() {
+        val list = listOf(false, false, false, false, false)
+        assert(list.areAllUnchecked())
+    }
 }
