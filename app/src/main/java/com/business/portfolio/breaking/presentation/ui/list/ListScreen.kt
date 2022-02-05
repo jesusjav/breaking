@@ -26,7 +26,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -78,7 +77,7 @@ private fun Body(
         OutlinedTextField(
             value = viewModel.filter.value,
             onValueChange = { charName ->
-                viewModel.onFilterByString(charName)
+                viewModel.onFilterByName(charName)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,7 +92,7 @@ private fun Body(
             ),
             placeholder = {
                 Text(
-                    text = "search character",
+                    text = stringResource(R.string.placeholder),
                     color = MaterialTheme.colors.secondary
                 )
             },

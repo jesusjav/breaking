@@ -15,19 +15,17 @@
  */
 package com.business.portfolio.breaking.presentation.ui.list
 
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.business.portfolio.breaking.domain.model.Character
 import com.business.portfolio.breaking.domain.usecase.GetCharacterListUseCase
+import com.business.portfolio.breaking.presentation.utils.Constants
+import com.business.portfolio.breaking.presentation.utils.reset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,9 +34,14 @@ class ListViewModel
     private val getCharacterListUseCase: GetCharacterListUseCase,
 ) : ViewModel() {
 
+    // Mantain the internal data in viewmodel
     private var _list = MutableStateFlow(emptyList<Character>())
 
-    var results = MutableStateFlow(emptyList<Character>())
+    // Results back field with filtered results
+    private var _results = MutableStateFlow(emptyList<Character>())
+
+    // Expose results to compose
+    var results: StateFlow<List<Character>> = _results
 
     var filter = mutableStateOf("")
 
@@ -50,27 +53,27 @@ class ListViewModel
 
     private fun getCharacterList() {
         getCharacterListUseCase()
-            .onEach { _list.value = it }
-            .onEach { results.value = it }
+            .onEach {
+                _list.value = it
+                _results.value = it
+            }
             .flowOn(Dispatchers.IO)
             .catch { e -> e.printStackTrace() }
             .launchIn(viewModelScope)
     }
 
-    fun onFilterByString(characterName: String) {
-        if (characterName.isNullOrBlank()) {
-            results.value = _list.value
+    fun onFilterByName(characterName: String) {
+        if (characterName.isBlank()) {
+            _results.reset(_list.value)
             filter.value = ""
             return
         }
-        filter.value = characterName
-        val listFiltered = mutableListOf<Character>()
-        _list.value.forEach {
-            if (it.name.lowercase().startsWith(characterName.lowercase())) {
-                listFiltered.add(it)
-            }
+        viewModelScope.launch {
+            filter.value = characterName
+            _results.value = _list.map {
+                it.filter { it.name.lowercase().startsWith(characterName.lowercase()) }
+            }.debounce(Constants.BOUNCE_TIME).first()
         }
-        results.value = listFiltered
     }
 
     fun onFilterBySeason(season: Int) {
@@ -80,7 +83,7 @@ class ListViewModel
 
         val isAllUnchecked = areAllUnchecked(tempCheck)
         if (isAllUnchecked) {
-            results.value = _list.value
+            _results.value = _list.value
             return
         }
 
@@ -102,7 +105,7 @@ class ListViewModel
             }
         }
 
-        results.value = listFiltered
+        _results.value = listFiltered
 
     }
 
