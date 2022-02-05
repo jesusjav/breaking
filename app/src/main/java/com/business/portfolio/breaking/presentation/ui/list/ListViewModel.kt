@@ -22,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import com.business.portfolio.breaking.domain.model.Character
 import com.business.portfolio.breaking.domain.usecase.GetCharacterListUseCase
 import com.business.portfolio.breaking.presentation.utils.Constants
+import com.business.portfolio.breaking.presentation.utils.areAllUnchecked
 import com.business.portfolio.breaking.presentation.utils.reset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -34,18 +35,15 @@ class ListViewModel
     private val getCharacterListUseCase: GetCharacterListUseCase,
 ) : ViewModel() {
 
-    // Mantain the internal data in viewmodel
     private var _list = MutableStateFlow(emptyList<Character>())
 
-    // Results back field with filtered results
     private var _results = MutableStateFlow(emptyList<Character>())
-
-    // Expose results to compose
     var results: StateFlow<List<Character>> = _results
 
     var filter = mutableStateOf("")
 
-    val seasons = MutableStateFlow(mutableListOf<Boolean>(false, false, false, false, false))
+    val seasonsSelection =
+        MutableStateFlow(mutableListOf(false, false, false, false, false))
 
     init {
         getCharacterList()
@@ -77,46 +75,24 @@ class ListViewModel
     }
 
     fun onFilterBySeason(season: Int) {
-        var tempCheck = seasons.value.toMutableList()
-        tempCheck.set(season, !tempCheck.get(season))
-        seasons.value = tempCheck
+        val checkBoxesList = seasonsSelection.value.toMutableList()
+        checkBoxesList.set(season, !checkBoxesList.get(season))
+        seasonsSelection.value = checkBoxesList
 
-        val isAllUnchecked = areAllUnchecked(tempCheck)
+        val isAllUnchecked = checkBoxesList.toList().areAllUnchecked()
         if (isAllUnchecked) {
             _results.value = _list.value
             return
         }
 
-        val listFiltered = mutableListOf<Character>()
+        val checkedMapped = seasonsSelection.value.mapIndexed { index, checked ->
+            (index + 1).takeIf { checked }
+        }.filterNotNull()
 
-        _list.value.forEach {
-            var checked: List<Boolean> = seasons.value
-            var appearance: List<Int> = it.appearance
-            var allSelected = true
-            for (apperianceAux in appearance) {
-                if (!checked.get(apperianceAux - 1)) {
-                    allSelected = false
-                    break
-                }
-            }
-
-            if (allSelected) {
-                listFiltered.add(it)
-            }
+        _results.value = _list.value.filter {
+            checkedMapped.intersect(it.appearance).isNotEmpty()
         }
 
-        _results.value = listFiltered
-
-    }
-
-    private fun areAllUnchecked(checked: List<Boolean>): Boolean {
-        var isAllChecked = false
-        for (check in checked) {
-            if (check) {
-                isAllChecked = true
-                break
-            }
-        }
-        return !isAllChecked
     }
 }
+

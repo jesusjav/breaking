@@ -48,7 +48,7 @@ fun ListScreen(
     modifier: Modifier = Modifier
 ) {
     val list = viewModel.results.collectAsState()
-    val checked = viewModel.seasons.collectAsState()
+    val checked = viewModel.seasonsSelection.collectAsState()
     Body(viewModel, list, select, modifier, checked)
 }
 
