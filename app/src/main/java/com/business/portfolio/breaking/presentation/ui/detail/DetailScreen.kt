@@ -81,7 +81,7 @@ private fun Body(character: Character) {
 }
 
 @Composable
-private fun Extra(
+fun Extra(
     character: Character
 ) {
     Card(modifier = Modifier.fillMaxHeight()) {

@@ -23,6 +23,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import com.business.portfolio.breaking.domain.repository.CharactersRepository
 import com.business.portfolio.breaking.domain.usecase.GetCharacterListUseCase
 import com.business.portfolio.breaking.domain.usecase.GetCharacterUseCase
+import dagger.hilt.internal.TestSingletonComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
