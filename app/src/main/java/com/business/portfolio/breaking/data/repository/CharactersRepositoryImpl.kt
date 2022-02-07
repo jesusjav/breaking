@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-open class CharactersRepositoryImpl @Inject constructor(
+class CharactersRepositoryImpl @Inject constructor(
     private val api: BreakingApi,
 ) : CharactersRepository {
 

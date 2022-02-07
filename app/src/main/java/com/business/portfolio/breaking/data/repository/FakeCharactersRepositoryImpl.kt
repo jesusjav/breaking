@@ -25,8 +25,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-
-open class FakeCharactersRepositoryImpl : CharactersRepository {
+class FakeCharactersRepositoryImpl : CharactersRepository {
 
     private val character1 = CharacterResponse(
         1,
