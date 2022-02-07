@@ -21,9 +21,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -61,6 +59,7 @@ private fun Body(
     modifier: Modifier,
     checked: State<List<Boolean>>,
 ) {
+    var init by remember { mutableStateOf(true) }
     Column(
         modifier = modifier
             .statusBarsPadding()
@@ -135,6 +134,19 @@ private fun Body(
             }
         }
 
+        if (list.value.isEmpty() && !init) {
+            Text(
+                stringResource(R.string.empty_list),
+                color = MaterialTheme.colors.secondary,
+                style = MaterialTheme.typography.body1,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .fillMaxSize()
+            )
+        }
+
         LazyVerticalGrid(
             cells = GridCells.Fixed(4),
             modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 2.dp)
@@ -145,6 +157,8 @@ private fun Body(
                 )
             }
         }
+
+        init = false
     }
 }
 

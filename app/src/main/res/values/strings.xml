@@ -3,4 +3,5 @@
     <string name="breaking">Breaking Test</string>
     <string name="empty">Empty</string>
     <string name="placeholder">Search character</string>
+    <string name="empty_list">No results found</string>
 </resources>
