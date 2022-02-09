@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,17 +49,22 @@ fun ListScreen(
 ) {
     val list = viewModel.results.collectAsState()
     val checked = viewModel.seasonsSelection.collectAsState()
-    Body(viewModel, list, select, modifier, checked)
+    val filter = viewModel.filter.collectAsState()
+    val onFilterByName = viewModel.onFilterByName
+    val onFilterBySeason = viewModel.onFilterBySeason
+    Body(list, select, modifier, checked, filter, onFilterByName, onFilterBySeason)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Body(
-    viewModel: ListViewModel,
+fun Body(
     list: State<List<Character>>,
     select: (Character) -> Unit,
     modifier: Modifier,
     checked: State<List<Boolean>>,
+    filter: State<String>,
+    onFilterByName: (String) -> Unit,
+    onFilterBySeason: (Int) -> Unit
 ) {
     var init by remember { mutableStateOf(true) }
     Column(
@@ -74,9 +81,9 @@ private fun Body(
         )
 
         OutlinedTextField(
-            value = viewModel.filter.value,
+            value = filter.value,
             onValueChange = { charName ->
-                viewModel.onFilterByName(charName)
+                onFilterByName(charName)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -102,7 +109,7 @@ private fun Body(
 
         LazyRow(
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             checked.value.forEachIndexed { index, season ->
                 item {
@@ -110,12 +117,12 @@ private fun Body(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
                             checked = season,
                             onCheckedChange = {
-                                viewModel.onFilterBySeason(index)
+                                onFilterBySeason(index)
                             },
 
                             colors = CheckboxDefaults.colors(
@@ -172,7 +179,10 @@ fun FeaturedList(
         modifier = modifier
             .padding(4.dp)
             .fillMaxHeight()
-            .clickable { select.invoke(character) },
+            .clickable { select.invoke(character) }
+            .semantics {
+                contentDescription = "visual list item"
+            },
 //        color = MaterialTheme.colors.surface,
         elevation = 5.dp,
 

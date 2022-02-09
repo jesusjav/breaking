@@ -66,7 +66,7 @@ class FakeCharactersRepositoryImpl : CharactersRepository {
         "Breaking Bad"
     )
 
-    private val characterList = listOf<CharacterResponse>(character1, character2, character3)
+    val characterList = listOf<CharacterResponse>(character1, character2, character3)
 
 
     override fun getCharacterList(): Flow<List<Character>> = flow { emit(characterList) }

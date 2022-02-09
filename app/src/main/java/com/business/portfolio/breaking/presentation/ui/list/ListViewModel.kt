@@ -35,12 +35,13 @@ class ListViewModel
     private val getCharacterListUseCase: GetCharacterListUseCase,
 ) : ViewModel() {
 
+    //todo: best compress all in UIstate data class and pass that to compose
     private var _list = MutableStateFlow(emptyList<Character>())
 
     private var _results = MutableStateFlow(emptyList<Character>())
     var results: StateFlow<List<Character>> = _results
 
-    var filter = mutableStateOf("")
+    var filter = MutableStateFlow("")
 
     val seasonsSelection =
         MutableStateFlow(mutableListOf(false, false, false, false, false))
@@ -60,21 +61,21 @@ class ListViewModel
             .launchIn(viewModelScope)
     }
 
-    fun onFilterByName(characterName: String) {
+    val onFilterByName: (characterName: String) -> Unit = { characterName ->
         if (characterName.isBlank()) {
             _results.reset(_list.value)
             filter.value = ""
-            return
-        }
-        viewModelScope.launch {
-            filter.value = characterName
-            _results.value = _list.map {
-                it.filter { it.name.lowercase().startsWith(characterName.lowercase()) }
-            }.debounce(Constants.BOUNCE_TIME).first()
+        } else {
+            viewModelScope.launch {
+                filter.value = characterName
+                _results.value = _list.map {
+                    it.filter { it.name.lowercase().startsWith(characterName.lowercase()) }
+                }.debounce(Constants.BOUNCE_TIME).first()
+            }
         }
     }
 
-    fun onFilterBySeason(season: Int) {
+    var onFilterBySeason: (season: Int) -> Unit = { season ->
         val checkBoxesList = seasonsSelection.value.toMutableList()
         checkBoxesList.set(season, !checkBoxesList.get(season))
         seasonsSelection.value = checkBoxesList
@@ -82,15 +83,14 @@ class ListViewModel
         val isAllUnchecked = checkBoxesList.toList().areAllUnchecked()
         if (isAllUnchecked) {
             _results.value = _list.value
-            return
-        }
+        } else {
+            val checkedMapped = seasonsSelection.value.mapIndexed { index, checked ->
+                (index + 1).takeIf { checked }
+            }.filterNotNull()
 
-        val checkedMapped = seasonsSelection.value.mapIndexed { index, checked ->
-            (index + 1).takeIf { checked }
-        }.filterNotNull()
-
-        _results.value = _list.value.filter {
-            checkedMapped.intersect(it.appearance).isNotEmpty()
+            _results.value = _list.value.filter {
+                checkedMapped.intersect(it.appearance).isNotEmpty()
+            }
         }
 
     }
