@@ -121,14 +121,15 @@ fun Extra(
                 )
             }
 
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text(
-                    text = "Seasons: " + character.appearance.joinToString(separator = ","),
-                    style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Thin,
-                )
+            if (character.appearance.isNotEmpty()) {
+                Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Text(
+                        text = "Seasons: " + character.appearance.joinToString(separator = ","),
+                        style = MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Thin,
+                    )
+                }
             }
-
 
         }
     }
